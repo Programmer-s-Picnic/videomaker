@@ -29,7 +29,7 @@ FADE_DURATION = 0.4           # fade in/out seconds
 
 # Files
 INPUT_FILE = "champak.txt"    # text content
-VOICE_FILE = "voice.wav"      # your recorded voice
+VOICE_FILE = "champak.wav"      # your recorded voice
 OUTPUT_VIDEO = "output/myvoice.mp4"
 
 # Watermark / Branding
