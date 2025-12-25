@@ -1,212 +1,131 @@
+ import sys
 import os
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from moviepy.editor import (
+    AudioFileClip,
+    TextClip,
+    CompositeVideoClip,
+    ColorClip
+)
 
-from moviepy.editor import VideoClip, AudioFileClip, CompositeAudioClip
-import moviepy.video.fx.all as vfx
-import moviepy.audio.fx.all as afx
-
-# =============================
+# --------------------------------------------------
 # CONFIG
-# =============================
-
-WIDTH, HEIGHT = 1080, 1920
+# --------------------------------------------------
+VIDEO_W, VIDEO_H = 1080, 1920   # Vertical (9:16)
+BG_COLORS = [
+    (255, 236, 210),   # saffron
+    (255, 248, 230)    # lighter saffron
+]
+FONT = "Arial-Bold"
+FONT_SIZE = 90
+FONT_COLOR = "black"
+MARGIN = 120
 FPS = 30
+SCREEN_BREAK = "===SCREEN==="
+# --------------------------------------------------
 
-HOOK_FONT_SIZE = 78
-BODY_FONT_SIZE = 70
-WATERMARK_FONT_SIZE = 52
+# --------------------------------------------------
+# ARGUMENTS (from GUI or CLI)
+# --------------------------------------------------
+if len(sys.argv) < 6:
+    print("Usage:")
+    print("python champakvoice.py input.txt voice.wav music(optional) webcam(optional) output.mp4")
+    sys.exit(1)
 
-BODY_DRIFT_UP_PX = 120
-FADE_DURATION = 0.4
+text_file   = sys.argv[1]
+voice_file  = sys.argv[2]
+music_file  = sys.argv[3]   # optional (ignored for now)
+webcam_file = sys.argv[4]   # optional (ignored for now)
+output_file = sys.argv[5]
 
-INPUT_FILE = "input.txt"
-VOICE_FILE = "voice.wav"
-MUSIC_FILE = "music.mp3"
-OUTPUT_VIDEO = "output/short_1.mp4"
+os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-WATERMARK_TEXT = "PROGRAMMER’S PICNIC • LEARNWITHCHAMPAK.LIVE"
+print("📄 Script :", text_file)
+print("🎙 Voice  :", voice_file)
+print("🎬 Output :", output_file)
 
-TOP_COLOR = (255, 153, 51)
-BOTTOM_COLOR = (255, 236, 209)
+# --------------------------------------------------
+# LOAD AUDIO
+# --------------------------------------------------
+audio = AudioFileClip(voice_file)
+duration = audio.duration
 
-HOOK_TEXT_COLOR = (255, 255, 255)
-BODY_TEXT_COLOR = (40, 40, 40)
+# --------------------------------------------------
+# READ SCRIPT WITH COMMANDS
+# --------------------------------------------------
+with open(text_file, "r", encoding="utf-8") as f:
+    raw_lines = [l.strip() for l in f if l.strip()]
 
-HIGHLIGHT_BG = (255, 200, 0, 180)  # saffron highlight
+if not raw_lines:
+    raise ValueError("input.txt is empty")
 
-MUSIC_VOLUME = 0.12
+scenes = []
 
-# =============================
-# FONT LOADER
-# =============================
+for line in raw_lines:
+    if line.upper() == SCREEN_BREAK:
+        scenes.append({"type": "blank"})
+    else:
+        scenes.append({"type": "text", "content": line})
 
-def load_font(size):
-    for name in ["arial.ttf", "calibri.ttf", "CascadiaCode.ttf"]:
-        try:
-            return ImageFont.truetype(name, size)
-        except:
-            continue
-    return ImageFont.load_default()
+total_scenes = len(scenes)
+scene_duration = duration / total_scenes
 
-# =============================
-# BACKGROUND
-# =============================
+print(f"🧠 Total scenes: {total_scenes}")
+print(f"⏱ Each scene: {scene_duration:.2f} seconds")
 
-def create_gradient():
-    img = Image.new("RGB", (WIDTH, HEIGHT))
-    draw = ImageDraw.Draw(img)
+# --------------------------------------------------
+# BUILD VIDEO SCENES
+# --------------------------------------------------
+clips = []
+current_time = 0
 
-    for y in range(HEIGHT):
-        r = int(TOP_COLOR[0] + (BOTTOM_COLOR[0] - TOP_COLOR[0]) * y / HEIGHT)
-        g = int(TOP_COLOR[1] + (BOTTOM_COLOR[1] - TOP_COLOR[1]) * y / HEIGHT)
-        b = int(TOP_COLOR[2] + (BOTTOM_COLOR[2] - TOP_COLOR[2]) * y / HEIGHT)
-        draw.line([(0, y), (WIDTH, y)], fill=(r, g, b))
+for i, scene in enumerate(scenes):
+    bg_color = BG_COLORS[i % len(BG_COLORS)]
 
-    return img.convert("RGBA")
+    # Background (always)
+    bg = ColorClip(
+        size=(VIDEO_W, VIDEO_H),
+        color=bg_color,
+        duration=scene_duration
+    ).set_start(current_time)
 
-# =============================
-# TEXT WRAP
-# =============================
+    clips.append(bg)
 
-def wrap_text(draw, text, font, max_width):
-    words = text.split()
-    lines = []
-    current = ""
+    # Text overlay (only if text scene)
+    if scene["type"] == "text":
+        txt = TextClip(
+            scene["content"],
+            fontsize=FONT_SIZE,
+            font=FONT,
+            color=FONT_COLOR,
+            size=(VIDEO_W - MARGIN, None),
+            method="caption",
+            align="center"
+        ).set_position("center") \
+         .set_start(current_time) \
+         .set_duration(scene_duration)
 
-    for w in words:
-        test = current + " " + w if current else w
-        if draw.textlength(test, font=font) <= max_width:
-            current = test
-        else:
-            lines.append(current)
-            current = w
+        clips.append(txt)
 
-    if current:
-        lines.append(current)
+    current_time += scene_duration
 
-    return lines
+# --------------------------------------------------
+# FINAL COMPOSITION
+# --------------------------------------------------
+final = CompositeVideoClip(
+    clips,
+    size=(VIDEO_W, VIDEO_H)
+).set_audio(audio)
 
-# =============================
-# LINE HIGHLIGHT LOGIC
-# =============================
+# --------------------------------------------------
+# EXPORT
+# --------------------------------------------------
+print("🎬 Rendering video...")
 
-def active_line_index(total_lines, duration, t):
-    if total_lines == 0:
-        return -1
-    slot = duration / total_lines
-    idx = int(t // slot)
-    return min(idx, total_lines - 1)
-
-# =============================
-# FRAME RENDERER
-# =============================
-
-def frame_renderer(hook, body, duration):
-    hook_font = load_font(HOOK_FONT_SIZE)
-    body_font = load_font(BODY_FONT_SIZE)
-    watermark_font = load_font(WATERMARK_FONT_SIZE)
-
-    background = create_gradient()
-
-    temp = Image.new("RGBA", (WIDTH, HEIGHT))
-    temp_draw = ImageDraw.Draw(temp)
-
-    hook_lines = wrap_text(temp_draw, hook, hook_font, WIDTH * 0.9)
-    body_lines = wrap_text(temp_draw, body, body_font, WIDTH * 0.85)
-
-    hook_height = len(hook_lines) * (HOOK_FONT_SIZE + 10) + 30
-    watermark_height = 90
-    watermark_y = HEIGHT - watermark_height - 60
-
-    def make_frame(t):
-        img = background.copy()
-        draw = ImageDraw.Draw(img)
-
-        # ---------- HOOK ----------
-        hook_bg = Image.new("RGBA", (WIDTH, hook_height), (0, 0, 0, 170))
-        img.paste(hook_bg, (0, 0), hook_bg)
-
-        y = 15
-        for line in hook_lines:
-            x = (WIDTH - draw.textlength(line, hook_font)) // 2
-            draw.text((x, y), line, font=hook_font, fill=HOOK_TEXT_COLOR)
-            y += HOOK_FONT_SIZE + 10
-
-        # ---------- BODY (MOVING + LINE HIGHLIGHT) ----------
-        progress = t / duration
-        drift = int(BODY_DRIFT_UP_PX * progress)
-
-        active_line = active_line_index(len(body_lines), duration, t)
-
-        base_y = HEIGHT // 2 - len(body_lines) * (BODY_FONT_SIZE + 12) // 2 + 120
-        y = base_y - drift
-
-        for i, line in enumerate(body_lines):
-            line_w = draw.textlength(line, body_font)
-            x = (WIDTH - line_w) // 2
-
-            if i == active_line:
-                pad = 12
-                rect = (
-                    x - pad,
-                    y - pad,
-                    x + line_w + pad,
-                    y + BODY_FONT_SIZE + pad
-                )
-                draw.rounded_rectangle(rect, radius=16, fill=HIGHLIGHT_BG)
-
-            draw.text((x, y), line, font=body_font, fill=BODY_TEXT_COLOR)
-            y += BODY_FONT_SIZE + 12
-
-        # ---------- WATERMARK ----------
-        wm_bg = Image.new("RGBA", (WIDTH, watermark_height), (0, 0, 0, 180))
-        img.paste(wm_bg, (0, watermark_y), wm_bg)
-
-        wm_x = (WIDTH - draw.textlength(WATERMARK_TEXT, watermark_font)) // 2
-        draw.text(
-            (wm_x, watermark_y + 18),
-            WATERMARK_TEXT,
-            font=watermark_font,
-            fill=(255, 255, 255)
-        )
-
-        return np.array(img.convert("RGB"))
-
-    return make_frame
-
-# =============================
-# MAIN
-# =============================
-
-os.makedirs("output", exist_ok=True)
-
-with open(INPUT_FILE, "r", encoding="utf-8") as f:
-    lines = [l.strip() for l in f if l.strip()]
-
-hook = lines[0]
-body = " ".join(lines[1:])
-
-voice = AudioFileClip(VOICE_FILE)
-music = AudioFileClip(MUSIC_FILE).volumex(MUSIC_VOLUME)
-music = music.fx(afx.audio_loop, duration=voice.duration)
-
-final_audio = CompositeAudioClip([music, voice])
-
-clip = VideoClip(
-    frame_renderer(hook, body, voice.duration),
-    duration=voice.duration
-)
-
-clip = clip.set_fps(FPS)
-clip = clip.fx(vfx.fadein, FADE_DURATION)
-clip = clip.set_audio(final_audio)
-
-clip.write_videofile(
-    OUTPUT_VIDEO,
+final.write_videofile(
+    output_file,
+    fps=FPS,
     codec="libx264",
-    audio_codec="aac",
-    fps=FPS
+    audio_codec="aac"
 )
 
-print("SHORT READY:", OUTPUT_VIDEO)
+print("✅ DONE!")

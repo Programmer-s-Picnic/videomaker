@@ -1,0 +1,29 @@
+Python allows this mistake silently.
+
+===SCREEN===
+
+Look at this code.
+
+```python
+items = []
+def add_item(x, bag=items):
+    bag.append(x)
+    return bag
+===SCREEN===
+dd_item(2)
+# [1, 2]
+===SCREEN===
+
+Mutable default arguments
+are shared forever.
+
+===SCREEN===
+
+---
+
+✅ Works with your Tkinter app  
+✅ Supports screen breaks  
+✅ Includes Python code blocks  
+✅ Optimized for Shorts pacing  
+
+Just save this as **`input.txt`**, generate the video, and publish 🚀
