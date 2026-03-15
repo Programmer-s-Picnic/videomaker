@@ -1,0 +1,174 @@
+{
+  "portfolio": [
+    {
+      "title": "Assi Sunrise Wedding Story",
+      "type": "wedding",
+      "location": "Assi Ghat, Varanasi",
+      "deliverable": "Teaser + full film",
+      "tags": ["Wedding", "Assi", "Golden Hour"],
+      "description": "A cinematic wedding film built around soft river light, rituals, candid emotion, and premium pacing.",
+      "videoUrl": "https://www.youtube.com/embed/hPCde2q1PEs",
+      "thumbnail": "assets/images/1.jpg",
+      "cardSize": "tall",
+      "visible": true
+    },
+    {
+      "title": "Cafe Brand Reel Pack",
+      "type": "commercial",
+      "location": "Sigra, Varanasi",
+      "deliverable": "Promo bundle",
+      "tags": ["Commercial", "Cafe", "Reels"],
+      "description": "Short-form branded content with ambience, product closeups, and quick commercial storytelling.",
+      "videoUrl": "assets/videos/sigra-brand.mp4",
+      "thumbnail": "assets/images/2.jpg",
+      "cardSize": "medium",
+      "visible": true
+    },
+    {
+      "title": "Stage Event Recap Film",
+      "type": "event",
+      "location": "BHU side, Varanasi",
+      "deliverable": "Event highlight",
+      "tags": ["Event", "Stage", "Recap"],
+      "description": "A fast recap format with audience reaction, stage moments, and crisp edit timing.",
+      "videoUrl": "https://www.youtube.com/embed/hPCde2q1PEs",
+      "thumbnail": "assets/images/3.jpg",
+      "cardSize": "medium",
+      "visible": true
+    },
+    {
+      "title": "Influencer Street Reel",
+      "type": "reel",
+      "location": "Godowlia, Varanasi",
+      "deliverable": "Vertical social edit",
+      "tags": ["Reel", "Creator", "Street"],
+      "description": "A social-first edit with movement, quick hook visuals, and strong retention-focused pacing.",
+      "videoUrl": "https://www.youtube.com/embed/hPCde2q1PEs",
+      "thumbnail": "assets/images/6.jpg",
+      "cardSize": "medium",
+      "visible": true
+    },
+    {
+      "title": "Heritage Story Segment",
+      "type": "documentary",
+      "location": "Sarnath, Varanasi",
+      "deliverable": "Interview + B-roll",
+      "tags": ["Documentary", "Heritage", "Story"],
+      "description": "A reflective documentary segment combining calm location visuals, interviews, and atmosphere.",
+      "videoUrl": "https://www.youtube.com/embed/hPCde2q1PEs",
+      "thumbnail": "assets/images/4.jpg",
+      "cardSize": "tall",
+      "visible": true
+    },
+    {
+      "title": "Fortside Couple Film",
+      "type": "wedding",
+      "location": "Ramnagar, Varanasi",
+      "deliverable": "Couple film",
+      "tags": ["Pre-Wedding", "Ramnagar", "Couple"],
+      "description": "Stylized couple portraits and cinematic motion built around heritage-inspired textures and frames.",
+      "videoUrl": "assets/videos/road.mp4",
+      "thumbnail": "assets/images/5.jpg",
+      "cardSize": "medium",
+      "visible": true
+    }
+  ],
+  "social": [
+    {
+      "platform": "Instagram highlight",
+      "title": "Wedding teaser drop",
+      "caption": "Quick emotional cut from a sunrise wedding story.",
+      "type": "wedding",
+      "thumbnail": "assets/images/1.jpg"
+    },
+    {
+      "platform": "Instagram highlight",
+      "title": "Brand reel preview",
+      "caption": "Food visuals, motion, and product storytelling in short-form format.",
+      "type": "commercial",
+      "thumbnail": "assets/images/2.jpg"
+    },
+    {
+      "platform": "Instagram highlight",
+      "title": "Event stage energy",
+      "caption": "Audience reaction and stage coverage packed into one fast recap.",
+      "type": "event",
+      "thumbnail": "assets/images/3.jpg"
+    },
+    {
+      "platform": "Instagram highlight",
+      "title": "Street creator motion",
+      "caption": "High-retention street reel pacing with strong movement.",
+      "type": "reel",
+      "thumbnail": "assets/images/6.jpg"
+    }
+  ],
+  "packages": [
+    {
+      "name": "Basic",
+      "hours": "Up to 4 hours",
+      "cameras": "1 camera",
+      "edit": "Highlight edit",
+      "delivery": "1 teaser or reel pack",
+      "price": "₹18k+"
+    },
+    {
+      "name": "Standard",
+      "hours": "Half day to full day",
+      "cameras": "2 cameras",
+      "edit": "Cinematic edit",
+      "delivery": "Teaser + highlights",
+      "price": "₹38k+"
+    },
+    {
+      "name": "Premium",
+      "hours": "Full day / extended",
+      "cameras": "3 cameras",
+      "edit": "Full film workflow",
+      "delivery": "Teaser + full film + reels",
+      "price": "₹70k+"
+    }
+  ],
+  "locations": [
+    {
+      "name": "Assi Ghat",
+      "lat": 25.2872,
+      "lng": 83.0061,
+      "mood": "golden, emotional, spiritual",
+      "bestFor": "weddings, couple films, sunrise reels",
+      "description": "Excellent for early morning light, water reflections, and soft cinematic mood. Ideal for emotional and premium visuals."
+    },
+    {
+      "name": "Lanka / BHU side",
+      "lat": 25.2677,
+      "lng": 82.9913,
+      "mood": "clean, youthful, modern",
+      "bestFor": "commercials, interviews, student stories",
+      "description": "Useful for cleaner movement, urban campus atmosphere, and organized shoot flow with easy access."
+    },
+    {
+      "name": "Sigra",
+      "lat": 25.3172,
+      "lng": 82.9866,
+      "mood": "urban, active, commercial",
+      "bestFor": "brand reels, store promos, event coverage",
+      "description": "Works well for commercial energy, cafe reels, storefront visuals, and quick city-side projects."
+    },
+    {
+      "name": "Sarnath",
+      "lat": 25.3811,
+      "lng": 83.0217,
+      "mood": "calm, reflective, heritage",
+      "bestFor": "documentaries, interview pieces, heritage stories",
+      "description": "Best for slower visual storytelling, composed frames, and thoughtful documentary mood."
+    },
+    {
+      "name": "Ramnagar Fort side",
+      "lat": 25.2705,
+      "lng": 83.0307,
+      "mood": "royal, textured, dramatic",
+      "bestFor": "pre-weddings, couple films, stylized portraits",
+      "description": "Strong for heritage-inspired mood, rich textures, dramatic couple visuals, and premium portrait work."
+    }
+  ]
+}

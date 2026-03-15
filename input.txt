@@ -1,4 +1,0 @@
-STOP SCROLLING 👇
-Most students misuse binary search.
-It ONLY works on sorted arrays.
-Remember this for exams & interviews.
