@@ -207,11 +207,24 @@ body[data-theme="rose"]{
   .image-shell img{max-height:60vh}
 }
 
-.image-shell.live-carousel-mode{background:transparent;border:none;box-shadow:none;display:flex;align-items:center;justify-content:center;padding:0;min-height:auto}
+.image-dialog.live-carousel-layout{display:block;width:min(1280px,calc(100vw - 24px));margin:4vh auto}
+.image-dialog.live-carousel-layout .image-close{position:fixed;top:16px;right:16px;left:auto;z-index:2205}
+.image-dialog.live-carousel-layout .image-nav{display:none !important}
+.image-shell.live-carousel-mode{width:min(94vw,1280px);max-width:1280px;min-height:min(86vh,860px);margin:0 auto;padding:0;background:transparent;border:none;box-shadow:none;display:flex;align-items:center;justify-content:center;overflow:visible}
 .image-shell.live-carousel-mode #imageModalImg,.image-shell.live-carousel-mode #imageCaption{display:none}
-.image-shell .carousel-card.is-live-in-modal{width:min(1100px,92vw);max-width:1100px;margin:0 auto;padding:0;background:transparent;border:none;box-shadow:none;overflow:visible}
-.image-shell .carousel-card.is-live-in-modal .carousel-stage{aspect-ratio:16/10;border-radius:28px;box-shadow:var(--shadow2)}
-.image-shell .carousel-card.is-live-in-modal .carousel-head{padding:0 4px 14px}
+.image-shell .carousel-card.is-live-in-modal{width:100%;max-width:none;margin:0 auto;padding:0;background:transparent;border:none;box-shadow:none;overflow:visible;transform:none !important}
+.image-shell .carousel-card.is-live-in-modal::before,.image-shell .carousel-card.is-live-in-modal::after{display:none !important}
+.image-shell .carousel-card.is-live-in-modal .carousel-head{padding:0 0 14px;align-items:center}
+.image-shell .carousel-card.is-live-in-modal .carousel-stage{aspect-ratio:auto;height:min(78vh,760px);border-radius:28px;box-shadow:var(--shadow2);background:#0b1020}
+.image-shell .carousel-card.is-live-in-modal .carousel-image{object-fit:contain;background:#0b1020}
+.image-shell .carousel-card.is-live-in-modal .carousel-dots{margin-top:18px}
+.image-shell .carousel-card.is-live-in-modal .carousel-controls{justify-content:flex-end}
+@media (max-width:780px){
+  .image-dialog.live-carousel-layout{width:min(100vw - 12px, 100vw);margin:2vh auto}
+  .image-dialog.live-carousel-layout .image-close{top:10px;right:10px;width:42px;height:42px;font-size:1.5rem}
+  .image-shell.live-carousel-mode{width:96vw;min-height:min(78vh,620px)}
+  .image-shell .carousel-card.is-live-in-modal .carousel-stage{height:min(62vh,520px);border-radius:20px}
+}
 
 
 body{transition:background .35s ease,color .35s ease}

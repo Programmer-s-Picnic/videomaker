@@ -112,6 +112,7 @@
       if (!current) return;
       if (current.tagName.toLowerCase() === 'iframe') current.src = '';
       else current.pause?.();
+      dialog.classList.remove('live-carousel-layout');
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
@@ -130,6 +131,7 @@
 
   function bindImageModal() {
     const modal = $('#imageModal');
+    const dialog = $('.image-dialog');
     const shell = $('.image-shell');
     const img = $('#imageModalImg');
     const caption = $('#imageCaption');
@@ -150,6 +152,7 @@
       delete live.dataset.modalPlaceholderId;
       live.__carouselApi?.start?.();
       shell.classList.remove('live-carousel-mode');
+      dialog.classList.remove('live-carousel-layout');
       img.style.display = '';
       caption.style.display = '';
       prevBtn.style.display = '';
@@ -191,6 +194,7 @@
       carousel.classList.add('is-live-in-modal');
       shell.appendChild(carousel);
       shell.classList.add('live-carousel-mode');
+      dialog.classList.add('live-carousel-layout');
       img.removeAttribute('src');
       img.style.display = 'none';
       caption.style.display = 'none';
@@ -204,6 +208,7 @@
 
     function closeImageModal() {
       clearLiveCarousel();
+      dialog.classList.remove('live-carousel-layout');
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       img.src = '';
