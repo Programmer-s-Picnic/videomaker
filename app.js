@@ -103,12 +103,31 @@
 
   function bindImageModal() {
     const modal = $('#imageModal');
+    const shell = $('.image-shell');
     const img = $('#imageModalImg');
     const caption = $('#imageCaption');
     const closeBtn = $('#imageClose');
     const backdrop = $('#imageBackdrop');
     const prevBtn = $('#imagePrev');
     const nextBtn = $('#imageNext');
+
+    function clearLiveCarousel() {
+      const live = shell.querySelector('.carousel-card.is-live-in-modal');
+      if (!live) return;
+      const placeholder = document.getElementById(live.dataset.modalPlaceholderId || '');
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.insertBefore(live, placeholder);
+        placeholder.remove();
+      }
+      live.classList.remove('is-live-in-modal');
+      delete live.dataset.modalPlaceholderId;
+      live.__carouselApi?.start?.();
+      shell.classList.remove('live-carousel-mode');
+      img.style.display = '';
+      caption.style.display = '';
+      prevBtn.style.display = '';
+      nextBtn.style.display = '';
+    }
 
     function renderImage() {
       const item = state.imageModal.items[state.imageModal.index];
@@ -119,16 +138,45 @@
     }
 
     function openImageModal(items, index=0) {
+      clearLiveCarousel();
       if (!items || !items.length) return;
       state.imageModal.items = items;
       state.imageModal.index = index;
       renderImage();
+      shell.classList.remove('live-carousel-mode');
+      img.style.display = '';
+      caption.style.display = '';
+      prevBtn.style.display = '';
+      nextBtn.style.display = '';
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
     }
 
+    function openLiveCarouselModal(carousel) {
+      if (!carousel || !shell) return;
+      clearLiveCarousel();
+      const ph = document.createElement('div');
+      ph.style.display = 'none';
+      ph.id = 'carousel-placeholder-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      carousel.parentNode.insertBefore(ph, carousel);
+      carousel.dataset.modalPlaceholderId = ph.id;
+      carousel.classList.add('is-live-in-modal');
+      shell.appendChild(carousel);
+      shell.classList.add('live-carousel-mode');
+      img.removeAttribute('src');
+      img.style.display = 'none';
+      caption.style.display = 'none';
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      carousel.__carouselApi?.start?.();
+    }
+
     function closeImageModal() {
+      clearLiveCarousel();
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       img.src = '';
@@ -143,6 +191,7 @@
     }
 
     window.__openKfImageModal = openImageModal;
+    window.__openKfLiveCarouselModal = openLiveCarouselModal;
     closeBtn?.addEventListener('click', closeImageModal);
     backdrop?.addEventListener('click', closeImageModal);
     prevBtn?.addEventListener('click', () => step(-1));
@@ -150,6 +199,7 @@
     document.addEventListener('keydown', (e) => {
       if (!modal.classList.contains('open')) return;
       if (e.key === 'Escape') closeImageModal();
+      if (shell.classList.contains('live-carousel-mode')) return;
       if (e.key === 'ArrowLeft') step(-1);
       if (e.key === 'ArrowRight') step(1);
     });
@@ -387,6 +437,7 @@
         interval = setInterval(next, 3500);
       }
       function stop() { clearInterval(interval); }
+      carousel.__carouselApi = { start, stop, next, prev, render, getIndex: () => index };
 
       dotsBox.innerHTML = slides.map((_, i) => `<button class="carousel-dot ${i===0?'active':''}" data-dot="${i}"></button>`).join('');
       $('.next', carousel)?.addEventListener('click', () => { stop(); prev(); next(); start(); pulseRise(carousel); });
@@ -406,8 +457,7 @@
       });
 
       carousel.addEventListener('dblclick', () => {
-        const items = slides.map((img) => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') || '' }));
-        window.__openKfImageModal?.(items, index);
+        window.__openKfLiveCarouselModal?.(carousel);
       });
       carousel.addEventListener('mouseenter', stop);
       carousel.addEventListener('mouseleave', () => { if (carousel.classList.contains('is-risen')) start(); });
