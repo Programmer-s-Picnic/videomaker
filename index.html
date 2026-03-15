@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-theme="saffron" data-design="cinematic">
   <div class="top-strip"><div class="ticker">Bookings open for 2026 • Weddings • Reels • Events • Commercial Films • Documentary Stories • Assi • Lanka • Sigra • Sarnath • Ramnagar</div></div>
 
   <header class="site-header">
@@ -33,6 +33,23 @@
         <a href="#map-explorer">Shoot Map</a>
         <a href="#contact">Book</a>
       </nav>
+      <div class="style-toolbar" id="styleToolbar">
+        <div class="toggle-group">
+          <span class="toggle-label">Theme</span>
+          <button class="toggle-btn active" data-theme="saffron">Saffron</button>
+          <button class="toggle-btn" data-theme="midnight">Midnight</button>
+          <button class="toggle-btn" data-theme="royal">Royal</button>
+          <button class="toggle-btn" data-theme="forest">Forest</button>
+          <button class="toggle-btn" data-theme="rose">Rose</button>
+        </div>
+        <div class="toggle-group">
+          <span class="toggle-label">Design</span>
+          <button class="toggle-btn active" data-design="cinematic">Cinematic</button>
+          <button class="toggle-btn" data-design="glass">Glass</button>
+          <button class="toggle-btn" data-design="minimal">Minimal</button>
+          <button class="toggle-btn" data-design="magazine">Magazine</button>
+        </div>
+      </div>
     </div>
   </header>
 

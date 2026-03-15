@@ -6,6 +6,33 @@
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
   const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
+
+  function bindCustomizer() {
+    const root = document.body;
+    const THEME_KEY = 'kfTheme';
+    const DESIGN_KEY = 'kfDesign';
+
+    function applyTheme(name) {
+      root.dataset.theme = name;
+      $$('[data-theme]').forEach(btn => btn.classList.toggle('active', btn.dataset.theme === name));
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', getComputedStyle(root).getPropertyValue('--accent').trim() || '#d97706');
+      localStorage.setItem(THEME_KEY, name);
+    }
+    function applyDesign(name) {
+      root.dataset.design = name;
+      $$('[data-design]').forEach(btn => btn.classList.toggle('active', btn.dataset.design === name));
+      localStorage.setItem(DESIGN_KEY, name);
+    }
+
+    const savedTheme = localStorage.getItem(THEME_KEY) || root.dataset.theme || 'saffron';
+    const savedDesign = localStorage.getItem(DESIGN_KEY) || root.dataset.design || 'cinematic';
+    applyTheme(savedTheme);
+    applyDesign(savedDesign);
+
+    $$('[data-theme]').forEach(btn => btn.addEventListener('click', () => applyTheme(btn.dataset.theme)));
+    $$('[data-design]').forEach(btn => btn.addEventListener('click', () => applyDesign(btn.dataset.design)));
+  }
+
   function bindNav() {
     const navToggle = $('#navToggle');
     const navLinks = $('#navLinks');
@@ -502,6 +529,7 @@
     });
   }
 
+  bindCustomizer();
   bindNav();
   bindWhatsApp();
   bindForm();
