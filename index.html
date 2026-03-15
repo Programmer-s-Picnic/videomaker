@@ -349,6 +349,19 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <div class="image-modal" id="imageModal" aria-hidden="true">
+    <div class="image-backdrop" id="imageBackdrop"></div>
+    <div class="image-dialog">
+      <button class="image-close" id="imageClose">×</button>
+      <button class="image-nav prev" id="imagePrev" aria-label="Previous image">‹</button>
+      <div class="image-shell">
+        <img id="imageModalImg" src="" alt="Expanded carousel image" />
+        <div class="image-caption" id="imageCaption"></div>
+      </div>
+      <button class="image-nav next" id="imageNext" aria-label="Next image">›</button>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

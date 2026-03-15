@@ -1,6 +1,6 @@
 (function () {
   const whatsappNumber = '919335874326';
-  const state = { projects: [], social: [], packages: [], locations: [], map: null, markers: [], activeLocation: null };
+  const state = { projects: [], social: [], packages: [], locations: [], map: null, markers: [], activeLocation: null, imageModal: { items: [], index: 0 } };
 
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
@@ -60,14 +60,14 @@
 
   function bindVideoModal() {
     const modal = $('#videoModal');
-    const frame = $('#videoFrame');
     const closeBtn = $('#videoClose');
     const backdrop = $('#videoBackdrop');
 
     function openVideo(url) {
       if (!url) return;
+      const existing = $('#videoFrame');
       if (url.endsWith('.mp4') || url.includes('/assets/videos/')) {
-        frame.outerHTML = '<video id="videoFrame" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000"><source src="' + url + '" type="video/mp4"></video>';
+        existing.outerHTML = '<video id="videoFrame" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000"><source src="' + url + '" type="video/mp4"></video>';
       } else {
         const oldFrame = $('#videoFrame');
         if (oldFrame.tagName.toLowerCase() !== 'iframe') {
@@ -90,13 +90,69 @@
       document.body.style.overflow = '';
     }
 
+    window.__openKfVideoModal = openVideo;
+
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.open-video-btn');
       if (btn) openVideo(btn.dataset.videoUrl);
     });
     closeBtn?.addEventListener('click', closeVideo);
     backdrop?.addEventListener('click', closeVideo);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideo(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeVideo(); });
+  }
+
+  function bindImageModal() {
+    const modal = $('#imageModal');
+    const img = $('#imageModalImg');
+    const caption = $('#imageCaption');
+    const closeBtn = $('#imageClose');
+    const backdrop = $('#imageBackdrop');
+    const prevBtn = $('#imagePrev');
+    const nextBtn = $('#imageNext');
+
+    function renderImage() {
+      const item = state.imageModal.items[state.imageModal.index];
+      if (!item) return;
+      img.src = item.src;
+      img.alt = item.alt || 'Expanded carousel image';
+      caption.textContent = item.alt || '';
+    }
+
+    function openImageModal(items, index=0) {
+      if (!items || !items.length) return;
+      state.imageModal.items = items;
+      state.imageModal.index = index;
+      renderImage();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      img.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function step(dir) {
+      const total = state.imageModal.items.length || 0;
+      if (!total) return;
+      state.imageModal.index = (state.imageModal.index + dir + total) % total;
+      renderImage();
+    }
+
+    window.__openKfImageModal = openImageModal;
+    closeBtn?.addEventListener('click', closeImageModal);
+    backdrop?.addEventListener('click', closeImageModal);
+    prevBtn?.addEventListener('click', () => step(-1));
+    nextBtn?.addEventListener('click', () => step(1));
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeImageModal();
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
+    });
   }
 
   async function loadData() {
@@ -235,6 +291,13 @@
 
   function initIntersectionVideos() {
     const localVideos = $$('.auto-play-video');
+    localVideos.forEach((video) => {
+      const card = video.closest('.video-showcase-card') || video;
+      card.addEventListener('dblclick', () => {
+        const source = $('source', video)?.src || video.currentSrc || video.getAttribute('src');
+        if (source) window.__openKfVideoModal?.(source);
+      });
+    });
     const localObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const video = entry.target;
@@ -253,6 +316,12 @@
     localVideos.forEach((video) => localObserver.observe(video));
 
     const ytBlocks = $$('.youtube-observer-video');
+    ytBlocks.forEach((box) => {
+      box.addEventListener('dblclick', () => {
+        const ytId = box.dataset.youtubeId;
+        if (ytId) window.__openKfVideoModal?.(`https://www.youtube.com/embed/${ytId}`);
+      });
+    });
     const ytObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         const box = entry.target;
@@ -336,6 +405,10 @@
         } else { audio.pause(); soundBtn.textContent = 'Play sound'; }
       });
 
+      carousel.addEventListener('dblclick', () => {
+        const items = slides.map((img) => ({ src: img.getAttribute('src'), alt: img.getAttribute('alt') || '' }));
+        window.__openKfImageModal?.(items, index);
+      });
       carousel.addEventListener('mouseenter', stop);
       carousel.addEventListener('mouseleave', () => { if (carousel.classList.contains('is-risen')) start(); });
 
@@ -383,6 +456,7 @@
   bindWhatsApp();
   bindForm();
   bindVideoModal();
+  bindImageModal();
   initIntersectionVideos();
   initCarousels();
   initParallaxTilt();
