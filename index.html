@@ -1,35 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cloudflare Worker Caller | Programmers Picnic</title>
 
-    <title>Complete WebSocket Diagnostic Test</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description"
-        content="Complete WebSocket testing page for Cloudflare Workers, custom domains, workers.dev, and local Wrangler testing." />
+        content="A simple HTTPS and WebSocket client page to test a Cloudflare Worker endpoint by Champak Roy." />
+    <meta name="keywords"
+        content="Cloudflare Worker, WebSocket test, WSS test, HTTPS API test, Champak Roy, Programmers Picnic" />
+    <meta name="author" content="Champak Roy" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#f59e0b" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cloudflare Worker Caller | Programmers Picnic" />
+    <meta property="og:description" content="Test HTTPS and WSS calls to a Cloudflare Worker endpoint." />
+    <meta property="og:image" content="https://server.learnwithchampak.live/seo-server-learnwithchampak.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cloudflare Worker Caller | Programmers Picnic" />
+    <meta name="twitter:description" content="Test HTTPS and WSS calls to a Cloudflare Worker endpoint." />
+    <meta name="twitter:image" content="https://server.learnwithchampak.live/seo-server-learnwithchampak.png" />
+
+    <!-- Google AdSense -->
+    <script async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8321261883090494&host=ca-host-pub-1556223355139109"
+        crossorigin="anonymous">
+        </script>
+
+    <!-- Programmer's Picnic scripts -->
+    <script src="https://varanasi-software-junction.github.io/search/branding/branding.js" defer></script>
+    <script src="https://programmer-s-picnic.github.io/json-images/find-on-page.js" defer></script>
+    <script src="https://programmer-s-picnic.github.io/json-images/contact_champak.js" defer></script>
 
     <style>
         :root {
             --bg: #fff7ed;
+            --bg2: #fffbeb;
             --card: #ffffff;
             --text: #1f2937;
             --muted: #6b7280;
-            --border: #fed7aa;
-            --accent: #f97316;
-            --accent-dark: #c2410c;
-            --success: #166534;
-            --success-bg: #dcfce7;
-            --danger: #b91c1c;
-            --danger-bg: #fee2e2;
-            --warning: #92400e;
-            --warning-bg: #fef3c7;
-            --info: #1d4ed8;
-            --info-bg: #dbeafe;
-            --code-bg: #111827;
-            --code-text: #f9fafb;
+            --line: #fed7aa;
+            --saffron: #f59e0b;
+            --saffron-dark: #d97706;
+            --green: #16a34a;
+            --red: #dc2626;
+            --dark: #111827;
+            --code: #fef3c7;
+            --shadow: 0 18px 45px rgba(146, 64, 14, 0.14);
         }
 
         * {
@@ -38,705 +59,355 @@
 
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #fff7ed, #ffedd5);
-            color: var(--text);
             min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top left, #ffedd5 0, transparent 34%),
+                radial-gradient(circle at bottom right, #fde68a 0, transparent 30%),
+                linear-gradient(135deg, var(--bg), var(--bg2));
+            color: var(--text);
             padding: 20px;
         }
 
-        .container {
-            max-width: 1180px;
-            margin: 0 auto;
+        .wrap {
+            max-width: 1100px;
+            margin: auto;
         }
 
         .hero {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 22px;
+            background: linear-gradient(135deg, #f59e0b, #fb923c);
+            color: white;
+            border-radius: 30px;
             padding: 28px;
-            box-shadow: 0 20px 40px rgba(124, 45, 18, 0.12);
-            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
         }
 
-        h1 {
-            margin: 0 0 10px;
-            color: var(--accent-dark);
-            font-size: 34px;
+        .hero h1 {
+            margin: 0 0 8px;
+            font-size: clamp(34px, 6vw, 64px);
+            line-height: 1;
+            letter-spacing: -0.05em;
         }
 
-        h2 {
-            margin-top: 0;
-            color: #7c2d12;
-        }
-
-        h3 {
-            margin-bottom: 8px;
-            color: #9a3412;
-        }
-
-        p {
-            line-height: 1.6;
-        }
-
-        .subtitle {
-            color: var(--muted);
+        .hero p {
             margin: 0;
+            font-size: 18px;
+            opacity: 0.95;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
             gap: 18px;
         }
 
-        @media (min-width: 900px) {
-            .grid.two {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .grid.three {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        .card {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--line);
+            border-radius: 26px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            margin-bottom: 18px;
         }
 
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(124, 45, 18, 0.08);
-            margin-bottom: 18px;
+        h2 {
+            margin-top: 0;
+            color: #9a3412;
         }
 
         label {
             display: block;
-            font-weight: 700;
+            font-weight: 900;
             margin-bottom: 8px;
+            color: #7c2d12;
         }
 
         input,
-        textarea,
-        select {
+        textarea {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
             border: 1px solid #fdba74;
-            font-size: 15px;
-            outline: none;
-            background: #fffaf5;
+            border-radius: 16px;
+            padding: 14px;
+            font: inherit;
+            background: white;
             color: var(--text);
+            outline: none;
         }
 
         textarea {
-            min-height: 90px;
+            min-height: 120px;
             resize: vertical;
         }
 
         input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+        textarea:focus {
+            border-color: var(--saffron-dark);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
         }
 
-        .buttons {
+        .row {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
+            flex-wrap: wrap;
             margin-top: 14px;
         }
 
         button {
-            border: none;
-            border-radius: 10px;
-            padding: 11px 15px;
-            font-weight: 700;
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 16px;
+            font-weight: 900;
             cursor: pointer;
-            background: var(--accent);
+            background: var(--saffron);
             color: white;
-            transition: 0.2s ease;
+            box-shadow: 0 8px 18px rgba(217, 119, 6, 0.2);
         }
 
         button:hover {
-            background: var(--accent-dark);
-            transform: translateY(-1px);
+            background: var(--saffron-dark);
         }
 
         button.secondary {
-            background: #374151;
-        }
-
-        button.secondary:hover {
-            background: #111827;
-        }
-
-        button.success {
-            background: var(--success);
-        }
-
-        button.success:hover {
-            background: #14532d;
+            background: #fff7ed;
+            color: #9a3412;
+            border: 1px solid #fdba74;
         }
 
         button.danger {
-            background: var(--danger);
-        }
-
-        button.danger:hover {
-            background: #7f1d1d;
-        }
-
-        button.info {
-            background: var(--info);
-        }
-
-        button.info:hover {
-            background: #1e40af;
-        }
-
-        .mini-button {
-            padding: 8px 10px;
-            font-size: 13px;
+            background: var(--red);
         }
 
         .status {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 14px;
+            padding: 9px 13px;
             border-radius: 999px;
-            background: var(--warning-bg);
-            color: var(--warning);
-            font-weight: 700;
-            margin-top: 14px;
+            font-weight: 900;
+            background: #fee2e2;
+            color: var(--red);
+            margin: 10px 0 14px;
+        }
+
+        .status.open {
+            background: #dcfce7;
+            color: var(--green);
         }
 
         .dot {
             width: 10px;
             height: 10px;
-            border-radius: 999px;
-            background: #f59e0b;
-        }
-
-        .status.open {
-            background: var(--success-bg);
-            color: var(--success);
-        }
-
-        .status.open .dot {
-            background: #22c55e;
-        }
-
-        .status.closed {
-            background: var(--danger-bg);
-            color: #991b1b;
-        }
-
-        .status.closed .dot {
-            background: #ef4444;
-        }
-
-        .status.connecting {
-            background: var(--info-bg);
-            color: var(--info);
-        }
-
-        .status.connecting .dot {
-            background: #3b82f6;
-        }
-
-        .result {
-            padding: 12px;
-            border-radius: 12px;
-            background: #fff7ed;
-            border: 1px dashed #fb923c;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-top: 12px;
-        }
-
-        .pass {
-            background: var(--success-bg);
-            color: var(--success);
-            border-color: #86efac;
-        }
-
-        .fail {
-            background: var(--danger-bg);
-            color: #991b1b;
-            border-color: #fca5a5;
-        }
-
-        .warn {
-            background: var(--warning-bg);
-            color: var(--warning);
-            border-color: #fcd34d;
-        }
-
-        .info-box {
-            background: var(--info-bg);
-            color: var(--info);
-            border-color: #93c5fd;
+            border-radius: 50%;
+            background: currentColor;
         }
 
         pre {
-            background: var(--code-bg);
-            color: var(--code-text);
-            border-radius: 14px;
-            padding: 16px;
-            min-height: 280px;
-            white-space: pre-wrap;
+            margin: 0;
+            min-height: 440px;
+            max-height: 650px;
             overflow: auto;
-            font-size: 14px;
+            white-space: pre-wrap;
+            background: var(--dark);
+            color: var(--code);
+            border-radius: 22px;
+            padding: 18px;
             line-height: 1.5;
-        }
-
-        code {
-            background: #ffedd5;
-            color: #7c2d12;
-            padding: 2px 6px;
-            border-radius: 5px;
-            font-weight: 700;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
             font-size: 14px;
-        }
-
-        th,
-        td {
-            border: 1px solid #fed7aa;
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: #ffedd5;
-            color: #7c2d12;
         }
 
         .small {
-            font-size: 13px;
             color: var(--muted);
+            font-size: 14px;
         }
 
-        .footer {
+        code {
+            background: #111827;
+            color: #fef3c7;
+            padding: 3px 7px;
+            border-radius: 8px;
+        }
+
+        .ad-wrap {
+            margin: 22px 0;
+            padding: 14px;
+            border: 1px dashed #fdba74;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.65);
             text-align: center;
             color: var(--muted);
             font-size: 13px;
-            margin: 30px 0 10px;
         }
 
-        .test-row {
+        .quick {
             display: grid;
-            grid-template-columns: 1fr;
             gap: 10px;
-            align-items: center;
-            border-bottom: 1px solid #ffedd5;
-            padding: 12px 0;
         }
 
-        @media (min-width: 800px) {
-            .test-row {
-                grid-template-columns: 1.2fr 1.6fr auto;
+        .quick button {
+            width: 100%;
+            text-align: left;
+            border-radius: 16px;
+        }
+
+        @media (max-width: 850px) {
+            .grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        .test-row:last-child {
-            border-bottom: none;
-        }
-
-        .mono {
-            font-family: Consolas, Monaco, monospace;
-            font-size: 13px;
-            word-break: break-all;
-        }
-
-        .pill {
-            display: inline-block;
-            border-radius: 999px;
-            padding: 4px 9px;
-            font-size: 12px;
-            font-weight: 700;
-            background: #ffedd5;
-            color: #7c2d12;
-            margin: 2px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <main class="wrap">
         <section class="hero">
-            <h1>Complete WebSocket Diagnostic Test</h1>
-            <p class="subtitle">
-                This page tests your Cloudflare Worker WebSocket server through custom domain,
-                workers.dev, normal HTTPS fetch, and live WebSocket connection.
-            </p>
-
-            <div id="status" class="status closed">
-                <span class="dot"></span>
-                <span id="statusText">Disconnected</span>
-            </div>
+            <h1>Cloudflare Worker Caller</h1>
+            <p>Test HTTPS and WebSocket calls to your Worker endpoint.</p>
         </section>
 
-        <section class="card">
-            <h2>Browser Environment</h2>
-            <div class="grid three">
-                <div class="result info-box">
-                    <strong>Current page URL</strong>
-                    <div id="currentUrl" class="mono"></div>
-                </div>
-
-                <div class="result info-box">
-                    <strong>Current origin</strong>
-                    <div id="currentOrigin" class="mono"></div>
-                </div>
-
-                <div class="result info-box">
-                    <strong>Protocol</strong>
-                    <div id="currentProtocol" class="mono"></div>
-                </div>
-            </div>
-
-            <div class="result warn">
-                If this page is loaded through <code>https://</code>, your WebSocket URL should usually use
-                <code>wss://</code>. A secure page cannot normally connect to an insecure
-                <code>ws://</code> endpoint.
-            </div>
-        </section>
-
-        <div class="grid two">
-            <section class="card">
-                <h2>Manual WebSocket Test</h2>
-
-                <label for="wsUrl">WebSocket URL</label>
-                <input id="wsUrl" type="text" value="wss://server.learnwithchampak.live/" />
-
-                <div class="buttons">
-                    <button class="mini-button" onclick="setWsUrl('wss://server.learnwithchampak.live/')">
-                        Custom Domain
-                    </button>
-
-                    <button class="mini-button" onclick="setWsUrl('wss://server.champaksworld.workers.dev/')">
-                        workers.dev
-                    </button>
-
-                    <button class="mini-button" onclick="setWsUrl('ws://localhost:8787/')">
-                        Local Wrangler
-                    </button>
-                </div>
-
-                <div class="buttons">
-                    <button class="success" onclick="connectWebSocket()">Connect</button>
-                    <button class="danger" onclick="closeWebSocket()">Close</button>
-                    <button class="secondary" onclick="clearLog()">Clear Log</button>
-                </div>
-
-                <div class="result">
-                    <strong>Expected success:</strong>
-                    <br />
-                    <code>OPEN</code>, then message from server, then echo reply after sending.
-                </div>
-            </section>
-
-            <section class="card">
-                <h2>Send Message</h2>
-
-                <label for="messageBox">Message</label>
-                <textarea id="messageBox">Hello from browser</textarea>
-
-                <div class="buttons">
-                    <button onclick="sendMessage()">Send Message</button>
-                    <button class="info" onclick="sendPing()">Send Ping</button>
-                    <button class="secondary" onclick="showReadyState()">Show readyState</button>
-                </div>
-
-                <div class="result">
-                    <strong>readyState:</strong>
-                    <br />
-                    <span class="pill">0 connecting</span>
-                    <span class="pill">1 open</span>
-                    <span class="pill">2 closing</span>
-                    <span class="pill">3 closed</span>
-                </div>
-            </section>
+        <div class="ad-wrap">
+            Advertisement
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8321261883090494"
+                data-ad-slot="7782388330" data-ad-format="auto" data-full-width-responsive="true">
+            </ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
         </div>
 
-        <section class="card">
-            <h2>All Tests</h2>
+        <section class="grid">
+            <div>
+                <article class="card">
+                    <h2>1. HTTPS Call</h2>
 
-            <div class="test-row">
-                <div>
-                    <strong>Test 1: HTTPS custom domain</strong>
-                    <div class="small">Checks whether the custom domain reaches your Worker as a normal page.</div>
-                </div>
-                <div class="mono">https://server.learnwithchampak.live/</div>
-                <button onclick="testHttp('https://server.learnwithchampak.live/', 'httpCustomResult')">
-                    Run
-                </button>
-            </div>
-            <div id="httpCustomResult" class="result"></div>
+                    <label for="httpUrl">HTTP/HTTPS Worker URL</label>
+                    <input id="httpUrl" value="https://shy-meadow-f207.champaksworld.workers.dev/" autocomplete="off" />
 
-            <div class="test-row">
-                <div>
-                    <strong>Test 2: HTTPS workers.dev</strong>
-                    <div class="small">Checks whether the original Worker URL is alive.</div>
-                </div>
-                <div class="mono">https://server.champaksworld.workers.dev/</div>
-                <button onclick="testHttp('https://server.champaksworld.workers.dev/', 'httpWorkersResult')">
-                    Run
-                </button>
-            </div>
-            <div id="httpWorkersResult" class="result"></div>
+                    <div class="row">
+                        <button onclick="callHttp()">Call HTTPS</button>
+                        <button class="secondary" onclick="callHttpStatus()">Call /api/status</button>
+                    </div>
 
-            <div class="test-row">
-                <div>
-                    <strong>Test 3: WSS custom domain</strong>
-                    <div class="small">Checks WebSocket handshake through your custom domain.</div>
-                </div>
-                <div class="mono">wss://server.learnwithchampak.live/</div>
-                <button onclick="testWebSocketOnce('wss://server.learnwithchampak.live/', 'wsCustomResult')">
-                    Run
-                </button>
-            </div>
-            <div id="wsCustomResult" class="result"></div>
+                    <p class="small">
+                        This uses <code>fetch()</code>. If the Worker allows normal HTTP requests, you will see the
+                        response in the log.
+                    </p>
+                </article>
 
-            <div class="test-row">
-                <div>
-                    <strong>Test 4: WSS workers.dev</strong>
-                    <div class="small">Checks WebSocket handshake through the original Worker domain.</div>
-                </div>
-                <div class="mono">wss://server.champaksworld.workers.dev/</div>
-                <button onclick="testWebSocketOnce('wss://server.champaksworld.workers.dev/', 'wsWorkersResult')">
-                    Run
-                </button>
-            </div>
-            <div id="wsWorkersResult" class="result"></div>
+                <article class="card">
+                    <h2>2. WebSocket Call</h2>
 
-            <div class="test-row">
-                <div>
-                    <strong>Test 5: Local Wrangler</strong>
-                    <div class="small">Use only if running <code>wrangler dev</code> locally.</div>
-                </div>
-                <div class="mono">ws://localhost:8787/</div>
-                <button onclick="testWebSocketOnce('ws://localhost:8787/', 'wsLocalResult')">
-                    Run
-                </button>
-            </div>
-            <div id="wsLocalResult" class="result"></div>
+                    <label for="wsUrl">WebSocket WSS URL</label>
+                    <input id="wsUrl" value="wss://shy-meadow-f207.champaksworld.workers.dev/" autocomplete="off" />
 
-            <div class="buttons">
-                <button class="success" onclick="runAllMainTests()">Run Main Tests</button>
-                <button class="info" onclick="runAllWebSocketTests()">Run All WebSocket Tests</button>
-                <button class="secondary" onclick="clearAllResults()">Clear Results</button>
+                    <div id="status" class="status">
+                        <span class="dot"></span>
+                        <span>Disconnected</span>
+                    </div>
+
+                    <div class="row">
+                        <button onclick="connectWS()">Connect WSS</button>
+                        <button onclick="sendMessage()">Send</button>
+                        <button class="danger" onclick="closeWS()">Close</button>
+                    </div>
+
+                    <p class="small">
+                        This uses <code>new WebSocket()</code>. Your Worker must support WebSocket upgrade requests.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <h2>3. Message</h2>
+
+                    <label for="message">Message to send</label>
+                    <textarea id="message">Champak</textarea>
+
+                    <div class="row">
+                        <button class="secondary" onclick="setTextMessage()">Text Test</button>
+                        <button class="secondary" onclick="setJsonMessage()">JSON Test</button>
+                        <button class="secondary" onclick="runAutoTest()">Auto Test</button>
+                        <button class="secondary" onclick="clearLog()">Clear Log</button>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <h2>Quick Switch</h2>
+
+                    <div class="quick">
+                        <button class="secondary" onclick="useShyMeadow()">
+                            Use shy-meadow-f207.champaksworld.workers.dev
+                        </button>
+
+                        <button class="secondary" onclick="useServerLearnWithChampak()">
+                            Use server.learnwithchampak.live
+                        </button>
+
+                        <button class="secondary" onclick="usePostmanEcho()">
+                            Use Postman Echo WSS
+                        </button>
+                    </div>
+                </article>
             </div>
+
+            <article class="card">
+                <h2>Log</h2>
+                <pre id="log"></pre>
+            </article>
         </section>
-
-        <section class="card">
-            <h2>Diagnosis Helper</h2>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Observation</th>
-                        <th>Meaning</th>
-                        <th>Fix</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>HTTPS custom domain fails</td>
-                        <td><code>server.learnwithchampak.live</code> is not reaching your Worker.</td>
-                        <td>Fix Cloudflare Worker Custom Domain or Route.</td>
-                    </tr>
-                    <tr>
-                        <td>HTTPS custom works, WSS custom fails</td>
-                        <td>Worker is reached, but WebSocket upgrade is failing.</td>
-                        <td>Check Worker code and <code>Upgrade</code> handling.</td>
-                    </tr>
-                    <tr>
-                        <td>workers.dev WSS works, custom WSS fails</td>
-                        <td>Worker code is okay. Custom domain route is the problem.</td>
-                        <td>Add Custom Domain in Worker → Settings → Domains & Routes.</td>
-                    </tr>
-                    <tr>
-                        <td>workers.dev WSS also fails</td>
-                        <td>Worker code is probably wrong.</td>
-                        <td>Use the correct <code>WebSocketPair</code> Worker code.</td>
-                    </tr>
-                    <tr>
-                        <td>Close code <code>1006</code></td>
-                        <td>Abnormal close. Browser did not get a clean WebSocket connection.</td>
-                        <td>Check DevTools → Network → WS → Status Code.</td>
-                    </tr>
-                    <tr>
-                        <td>Status <code>101</code></td>
-                        <td>Success. WebSocket handshake accepted.</td>
-                        <td>No route issue. Continue testing messages.</td>
-                    </tr>
-                    <tr>
-                        <td>Status <code>200</code></td>
-                        <td>Server gave a normal web response instead of WebSocket upgrade.</td>
-                        <td>Check Worker upgrade logic.</td>
-                    </tr>
-                    <tr>
-                        <td>Status <code>404</code></td>
-                        <td>Wrong route or custom domain not attached.</td>
-                        <td>Fix Worker route/custom domain.</td>
-                    </tr>
-                    <tr>
-                        <td>Status <code>525</code> or <code>526</code></td>
-                        <td>SSL/TLS issue.</td>
-                        <td>Check Cloudflare SSL mode and certificate.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="result warn">
-                Browser JavaScript cannot directly read the WebSocket HTTP status code after failure.
-                For that, open <code>DevTools → Network → WS → failed request → Headers</code>.
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>Recommended Worker Code</h2>
-            <p class="small">
-                Use this Worker code for the server side while testing.
-            </p>
-
-            <pre>export default {
-  async fetch(request) {
-    if (request.headers.get("Upgrade") !== "websocket") {
-      return new Response("Worker alive. WebSocket endpoint ready.", {
-        headers: {
-          "content-type": "text/plain;charset=UTF-8",
-          "cache-control": "no-store"
-        }
-      });
-    }
-
-    const pair = new WebSocketPair();
-    const client = pair[0];
-    const server = pair[1];
-
-    server.accept();
-
-    server.send("CONNECTED: Worker WebSocket is working.");
-
-    server.addEventListener("message", (event) => {
-      server.send("ECHO: " + event.data);
-    });
-
-    server.addEventListener("close", () => {
-      console.log("WebSocket closed");
-    });
-
-    server.addEventListener("error", (event) => {
-      console.log("WebSocket error", event);
-    });
-
-    return new Response(null, {
-      webSocket: client
-    });
-  }
-};</pre>
-        </section>
-
-        <section class="card">
-            <h2>Live Log</h2>
-            <pre id="log"></pre>
-        </section>
-
-        <div class="footer">
-            Complete WebSocket diagnostic page for Cloudflare Workers.
-        </div>
-    </div>
+    </main>
 
     <script>
         let ws = null;
 
         const logBox = document.getElementById("log");
         const statusBox = document.getElementById("status");
-        const statusText = document.getElementById("statusText");
-        const wsUrlInput = document.getElementById("wsUrl");
-        const messageBox = document.getElementById("messageBox");
 
-        document.getElementById("currentUrl").textContent = window.location.href;
-        document.getElementById("currentOrigin").textContent = window.location.origin;
-        document.getElementById("currentProtocol").textContent = window.location.protocol;
+        function log(title, data) {
+            const time = new Date().toLocaleTimeString();
+            let output = "[" + time + "] " + title;
 
-        function now() {
-            return new Date().toLocaleTimeString();
-        }
-
-        function log(message) {
-            logBox.textContent += "[" + now() + "] " + message + "\n";
-            logBox.scrollTop = logBox.scrollHeight;
-        }
-
-        function setStatus(type, text) {
-            statusBox.classList.remove("open", "closed", "connecting");
-
-            if (type) {
-                statusBox.classList.add(type);
+            if (data !== undefined) {
+                if (typeof data === "string") {
+                    output += "\n" + data;
+                } else {
+                    try {
+                        output += "\n" + JSON.stringify(data, null, 2);
+                    } catch {
+                        output += "\n" + String(data);
+                    }
+                }
             }
 
-            statusText.textContent = text;
-        }
-
-        function setWsUrl(url) {
-            wsUrlInput.value = url;
-            log("Manual WebSocket URL changed to: " + url);
+            logBox.textContent += output + "\n\n";
+            logBox.scrollTop = logBox.scrollHeight;
         }
 
         function clearLog() {
             logBox.textContent = "";
         }
 
-        function clearAllResults() {
-            const ids = [
-                "httpCustomResult",
-                "httpWorkersResult",
-                "wsCustomResult",
-                "wsWorkersResult",
-                "wsLocalResult"
-            ];
-
-            ids.forEach(function (id) {
-                const el = document.getElementById(id);
-                el.className = "result";
-                el.textContent = "";
-            });
-
-            log("All result boxes cleared.");
+        function setStatus(text, isOpen) {
+            statusBox.className = "status" + (isOpen ? " open" : "");
+            statusBox.querySelector("span:last-child").textContent = text;
         }
 
-        function setResult(id, type, html) {
-            const el = document.getElementById(id);
-            el.className = "result " + type;
-            el.innerHTML = html;
+        function getHttpUrl() {
+            return document.getElementById("httpUrl").value.trim();
         }
 
-        function escapeHtml(value) {
-            return String(value)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
+        function getWsUrl() {
+            return document.getElementById("wsUrl").value.trim();
         }
 
-        async function testHttp(url, resultId) {
-            log("HTTP TEST START: " + url);
-            setResult(resultId, "info-box", "Testing normal HTTPS fetch...");
+        async function callHttp() {
+            const url = getHttpUrl();
 
-            const start = performance.now();
+            if (!url) {
+                log("Please enter an HTTPS URL.");
+                return;
+            }
+
+            log("Calling HTTPS URL", url);
 
             try {
                 const response = await fetch(url, {
@@ -744,219 +415,49 @@
                     cache: "no-store"
                 });
 
+                const contentType = response.headers.get("content-type") || "";
                 const text = await response.text();
-                const ms = Math.round(performance.now() - start);
 
-                const preview = text.slice(0, 300);
-
-                if (response.ok) {
-                    setResult(
-                        resultId,
-                        "pass",
-                        "<strong>PASS</strong><br>" +
-                        "Status: <code>" + response.status + "</code><br>" +
-                        "Time: <code>" + ms + " ms</code><br>" +
-                        "Response preview:<br><pre style='min-height:80px'>" + escapeHtml(preview) + "</pre>"
-                    );
-
-                    log("HTTP TEST PASS: " + url + " status=" + response.status);
-                } else {
-                    setResult(
-                        resultId,
-                        "fail",
-                        "<strong>FAIL</strong><br>" +
-                        "Status: <code>" + response.status + "</code><br>" +
-                        "Time: <code>" + ms + " ms</code><br>" +
-                        "Response preview:<br><pre style='min-height:80px'>" + escapeHtml(preview) + "</pre>"
-                    );
-
-                    log("HTTP TEST FAIL: " + url + " status=" + response.status);
-                }
+                log("HTTPS response", {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    contentType,
+                    bodyPreview: text.slice(0, 3000)
+                });
             } catch (error) {
-                setResult(
-                    resultId,
-                    "fail",
-                    "<strong>FETCH ERROR</strong><br>" +
-                    escapeHtml(error.message) +
-                    "<br><br>This may be CORS, DNS, SSL, route, or network failure."
-                );
-
-                log("HTTP TEST ERROR: " + url + " " + error.message);
+                log("HTTPS call failed", {
+                    message: error.message,
+                    note: "If the Worker is online but this fails, check CORS, HTTPS, or network."
+                });
             }
         }
 
-        function testWebSocketOnce(url, resultId) {
-            return new Promise(function (resolve) {
-                log("WS TEST START: " + url);
+        async function callHttpStatus() {
+            let url = getHttpUrl();
 
-                setResult(resultId, "info-box", "Trying WebSocket connection...");
+            if (url.endsWith("/")) {
+                url = url.slice(0, -1);
+            }
 
-                let testSocket;
-                let finished = false;
-                let gotOpen = false;
-                let gotMessage = false;
-                let timeoutId;
+            url += "/api/status";
 
-                function finish(type, html) {
-                    if (finished) return;
+            document.getElementById("httpUrl").value = url;
 
-                    finished = true;
-                    clearTimeout(timeoutId);
-
-                    setResult(resultId, type, html);
-
-                    try {
-                        if (
-                            testSocket &&
-                            (
-                                testSocket.readyState === WebSocket.OPEN ||
-                                testSocket.readyState === WebSocket.CONNECTING
-                            )
-                        ) {
-                            testSocket.close(1000, "Diagnostic complete");
-                        }
-                    } catch (e) { }
-
-                    resolve({
-                        type: type,
-                        html: html,
-                        opened: gotOpen,
-                        gotMessage: gotMessage
-                    });
-                }
-
-                try {
-                    testSocket = new WebSocket(url);
-                } catch (error) {
-                    log("WS CREATE ERROR: " + url + " " + error.message);
-
-                    finish(
-                        "fail",
-                        "<strong>CREATE ERROR</strong><br>" + escapeHtml(error.message)
-                    );
-
-                    return;
-                }
-
-                timeoutId = setTimeout(function () {
-                    log("WS TEST TIMEOUT: " + url);
-
-                    finish(
-                        "fail",
-                        "<strong>TIMEOUT</strong><br>" +
-                        "No successful WebSocket connection within 8 seconds.<br>" +
-                        "Check DevTools → Network → WS."
-                    );
-                }, 8000);
-
-                testSocket.onopen = function () {
-                    gotOpen = true;
-                    log("WS OPEN: " + url);
-
-                    try {
-                        testSocket.send("Diagnostic hello from browser at " + new Date().toISOString());
-                        log("WS SENT DIAGNOSTIC MESSAGE: " + url);
-                    } catch (error) {
-                        log("WS SEND ERROR: " + error.message);
-                    }
-
-                    setTimeout(function () {
-                        if (gotOpen && !gotMessage) {
-                            finish(
-                                "pass",
-                                "<strong>PARTIAL PASS</strong><br>" +
-                                "WebSocket opened successfully, but no message was received from server within the wait time.<br>" +
-                                "This still proves the handshake worked."
-                            );
-                        }
-                    }, 1800);
-                };
-
-                testSocket.onmessage = function (event) {
-                    gotMessage = true;
-                    log("WS MESSAGE from " + url + ": " + event.data);
-
-                    finish(
-                        "pass",
-                        "<strong>PASS</strong><br>" +
-                        "WebSocket opened and received message.<br>" +
-                        "Server message:<br><pre style='min-height:80px'>" + escapeHtml(event.data) + "</pre>"
-                    );
-                };
-
-                testSocket.onerror = function () {
-                    log("WS ERROR EVENT: " + url);
-                };
-
-                testSocket.onclose = function (event) {
-                    log(
-                        "WS CLOSED: " +
-                        url +
-                        " code=" +
-                        event.code +
-                        " reason=" +
-                        (event.reason || "(empty)") +
-                        " wasClean=" +
-                        event.wasClean
-                    );
-
-                    if (!gotOpen) {
-                        let explanation = explainCloseCode(event.code);
-
-                        finish(
-                            "fail",
-                            "<strong>FAIL</strong><br>" +
-                            "WebSocket did not open.<br>" +
-                            "Close code: <code>" + event.code + "</code><br>" +
-                            "Reason: <code>" + escapeHtml(event.reason || "(empty)") + "</code><br>" +
-                            "wasClean: <code>" + event.wasClean + "</code><br><br>" +
-                            explanation +
-                            "<br><br>Open DevTools → Network → WS to see the actual HTTP status."
-                        );
-                    }
-                };
-            });
+            await callHttp();
         }
 
-        function explainCloseCode(code) {
-            if (code === 1006) {
-                return "Meaning: abnormal close. Most likely the WebSocket handshake failed, the route is wrong, SSL failed, or the Worker did not accept the upgrade.";
-            }
-
-            if (code === 1000) {
-                return "Meaning: normal close.";
-            }
-
-            if (code === 1001) {
-                return "Meaning: endpoint went away or connection was closed by server/browser.";
-            }
-
-            if (code === 1002) {
-                return "Meaning: protocol error.";
-            }
-
-            if (code === 1003) {
-                return "Meaning: unsupported data.";
-            }
-
-            return "Meaning: check browser DevTools for more details.";
-        }
-
-        function connectWebSocket() {
-            const url = wsUrlInput.value.trim();
+        function connectWS() {
+            const url = getWsUrl();
 
             if (!url) {
-                log("ERROR: WebSocket URL is empty.");
+                log("Please enter a WSS URL.");
                 return;
             }
 
-            if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
-                log("ERROR: WebSocket URL must start with ws:// or wss://");
-                return;
-            }
-
-            if (window.location.protocol === "https:" && url.startsWith("ws://")) {
-                log("WARNING: This page is HTTPS but the WebSocket URL is ws://. Browser may block mixed content.");
+            if (!url.startsWith("wss://")) {
+                log("Warning", "Use wss:// for HTTPS pages. ws:// may be blocked.");
             }
 
             if (ws && ws.readyState === WebSocket.OPEN) {
@@ -964,168 +465,131 @@
                 return;
             }
 
-            log("MANUAL CONNECT START");
-            log("URL: " + url);
-
-            setStatus("connecting", "Connecting");
-
             try {
                 ws = new WebSocket(url);
+
+                log("Connecting WebSocket", url);
+
+                ws.onopen = function () {
+                    setStatus("Connected", true);
+                    log("WebSocket connected.");
+
+                    const firstMessage = document.getElementById("message").value;
+                    if (firstMessage.trim()) {
+                        ws.send(firstMessage);
+                        log("Auto-sent first message", firstMessage);
+                    }
+                };
+
+                ws.onmessage = function (event) {
+                    let received = event.data;
+
+                    try {
+                        received = JSON.parse(event.data);
+                    } catch {
+                        // Keep plain text
+                    }
+
+                    log("WebSocket message received", received);
+                };
+
+                ws.onerror = function (event) {
+                    log("WebSocket error", {
+                        eventType: event.type,
+                        readyState: ws ? ws.readyState : "no socket",
+                        note: "Check whether the Worker code supports WebSocketPair and returns status 101."
+                    });
+                };
+
+                ws.onclose = function (event) {
+                    setStatus("Disconnected", false);
+
+                    log("WebSocket closed", {
+                        code: event.code,
+                        reason: event.reason || "No reason given",
+                        wasClean: event.wasClean
+                    });
+                };
             } catch (error) {
-                log("CREATE ERROR: " + error.message);
-                setStatus("closed", "Create failed");
-                return;
+                log("Failed to create WebSocket", {
+                    message: error.message
+                });
             }
-
-            ws.onopen = function () {
-                log("OPEN: WebSocket connected.");
-                log("readyState: " + ws.readyState + " / OPEN");
-                setStatus("open", "Connected");
-
-                try {
-                    ws.send("Browser connected at " + new Date().toISOString());
-                    log("AUTO SENT: Browser connected message");
-                } catch (error) {
-                    log("SEND ERROR after open: " + error.message);
-                }
-            };
-
-            ws.onmessage = function (event) {
-                log("MESSAGE FROM SERVER: " + event.data);
-            };
-
-            ws.onerror = function (event) {
-                log("ERROR: WebSocket error event fired.");
-                log("Check DevTools → Network → WS for the real HTTP status.");
-                console.error("WebSocket error event:", event);
-            };
-
-            ws.onclose = function (event) {
-                log("CLOSED");
-                log("code: " + event.code);
-                log("reason: " + (event.reason || "(empty)"));
-                log("wasClean: " + event.wasClean);
-
-                if (ws) {
-                    log("readyState: " + ws.readyState + " / CLOSED");
-                }
-
-                if (event.code === 1006) {
-                    log("Meaning of 1006: connection failed or closed abnormally before a clean close frame.");
-                    log("Most likely: Worker route/domain issue, SSL issue, or Worker did not return HTTP 101.");
-                }
-
-                setStatus("closed", "Disconnected");
-            };
         }
 
         function sendMessage() {
-            if (!ws) {
-                log("No WebSocket object. Click Connect first.");
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                log("Not connected. Click Connect WSS first.");
                 return;
             }
 
-            log("Current readyState: " + ws.readyState);
-
-            if (ws.readyState !== WebSocket.OPEN) {
-                log("Cannot send. WebSocket is not open.");
-                return;
-            }
-
-            const message = messageBox.value;
-
-            try {
-                ws.send(message);
-                log("SENT: " + message);
-            } catch (error) {
-                log("SEND ERROR: " + error.message);
-            }
+            const message = document.getElementById("message").value;
+            ws.send(message);
+            log("WebSocket message sent", message);
         }
 
-        function sendPing() {
+        function closeWS() {
             if (!ws) {
-                log("No WebSocket object. Click Connect first.");
+                log("No WebSocket object exists.");
                 return;
             }
 
-            if (ws.readyState !== WebSocket.OPEN) {
-                log("Cannot ping. WebSocket is not open.");
-                return;
-            }
-
-            const message = "PING " + new Date().toISOString();
-
-            try {
-                ws.send(message);
-                log("SENT: " + message);
-            } catch (error) {
-                log("PING ERROR: " + error.message);
-            }
+            ws.close(1000, "Closed by client");
+            log("Close requested by client.");
         }
 
-        function showReadyState() {
-            if (!ws) {
-                log("No WebSocket object exists yet.");
-                return;
-            }
+        function setTextMessage() {
+            document.getElementById("message").value = "Champak";
+            log("Text message prepared", "Champak");
+        }
 
-            const names = {
-                0: "CONNECTING",
-                1: "OPEN",
-                2: "CLOSING",
-                3: "CLOSED"
+        function setJsonMessage() {
+            const payload = {
+                name: "Champak Roy",
+                brand: "Programmers Picnic",
+                test: "Cloudflare Worker WebSocket",
+                target: getWsUrl(),
+                time: new Date().toISOString()
             };
 
-            log("readyState: " + ws.readyState + " / " + names[ws.readyState]);
+            document.getElementById("message").value = JSON.stringify(payload, null, 2);
+            log("JSON message prepared", payload);
         }
 
-        function closeWebSocket() {
-            if (!ws) {
-                log("No WebSocket object to close.");
-                return;
+        function runAutoTest() {
+            clearLog();
+            log("Starting auto test.");
+
+            callHttp();
+
+            setTimeout(function () {
+                connectWS();
+            }, 1200);
+        }
+
+        function useShyMeadow() {
+            document.getElementById("httpUrl").value = "https://shy-meadow-f207.champaksworld.workers.dev/";
+            document.getElementById("wsUrl").value = "wss://shy-meadow-f207.champaksworld.workers.dev/";
+            log("Switched target", "shy-meadow-f207.champaksworld.workers.dev");
+        }
+
+        function useServerLearnWithChampak() {
+            document.getElementById("httpUrl").value = "https://server.learnwithchampak.live/";
+            document.getElementById("wsUrl").value = "wss://server.learnwithchampak.live/";
+            log("Switched target", "server.learnwithchampak.live");
+        }
+
+        function usePostmanEcho() {
+            document.getElementById("httpUrl").value = "https://postman-echo.com/get";
+            document.getElementById("wsUrl").value = "wss://ws.postman-echo.com/raw";
+            log("Switched target", "Postman Echo WSS");
+        }
+
+        window.addEventListener("beforeunload", function () {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close(1000, "Page closed");
             }
-
-            if (ws.readyState === WebSocket.CLOSED) {
-                log("WebSocket is already closed.");
-                return;
-            }
-
-            log("Closing WebSocket...");
-
-            try {
-                ws.close(1000, "Closed by user");
-            } catch (error) {
-                log("CLOSE ERROR: " + error.message);
-            }
-        }
-
-        async function runAllMainTests() {
-            clearAllResults();
-
-            log("RUNNING MAIN TESTS...");
-
-            await testHttp("https://server.learnwithchampak.live/", "httpCustomResult");
-            await testHttp("https://server.champaksworld.workers.dev/", "httpWorkersResult");
-            await testWebSocketOnce("wss://server.learnwithchampak.live/", "wsCustomResult");
-            await testWebSocketOnce("wss://server.champaksworld.workers.dev/", "wsWorkersResult");
-
-            log("MAIN TESTS COMPLETE.");
-            log("Now compare custom domain result with workers.dev result.");
-        }
-
-        async function runAllWebSocketTests() {
-            log("RUNNING ALL WEBSOCKET TESTS...");
-
-            await testWebSocketOnce("wss://server.learnwithchampak.live/", "wsCustomResult");
-            await testWebSocketOnce("wss://server.champaksworld.workers.dev/", "wsWorkersResult");
-            await testWebSocketOnce("ws://localhost:8787/", "wsLocalResult");
-
-            log("ALL WEBSOCKET TESTS COMPLETE.");
-        }
-
-        log("Page loaded.");
-        log("Recommended first action: click Run Main Tests.");
-        log("Then open DevTools → Network → WS to see actual status code if WebSocket fails.");
+        });
     </script>
 </body>
 
